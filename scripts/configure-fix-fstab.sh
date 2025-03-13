@@ -24,12 +24,12 @@ function partition {
 	local repf=$1
 	local format=$(grep "Format=" $repf | cut -d '=' -f 2)
 	local mountpoint=$(grep "MountPoint=" $repf | cut -d '=' -f 2)
-	local label=$(grep "Label=" $repf | cut -d '=' -f 2)
+	local label=$(grep "Label=" $repf | cut -d '=' -f 2 | tr '[:lower:]' '[:upper:]')
 
 	# comment mount point to not generate fstab
 	sed -i "s/^MountPoint=/#&/" $repf
 	# Label should be in uppercase
-	sed -i "s/^Label=(.*)/Label=\U\1/" $repf
+	sed -i "s/^Label=.*/Label=$label/" $repf
 
 	[ -z "$mountpoint" ] && return
 
