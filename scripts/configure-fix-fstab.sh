@@ -36,7 +36,8 @@ function partition {
 	echo "LABEL=$label $mountpoint $format discard,rw,nodev,suid,exec 0 2" >> $TMPSRC_FSTAB
 }
 
-rm -fr $TMP
+rm -fr $TMPSRC_REPART
+rm -fr $TMPSRC_FSTAB
 mkdir -p $TMPSRC_REPART
 mkdir -p $(dirname $TMPSRC_FSTAB)
 
