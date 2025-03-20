@@ -1,5 +1,19 @@
 # redpesk mkosi
 
+mkosi is a systemd tool that generates disk images [https://mkosi.systemd.io](https://mkosi.systemd.io).
+
+For RedPesk, the main goal is that it uses systemd-repart for making gpt
+partitionning without any priviledge using libfdisk [https://www.freedesktop.org/software/systemd/man/latest/systemd-repart.html](https://www.freedesktop.org/software/systemd/man/latest/systemd-repart.html).
+
+Have a look on the man page for more information:
+
+```
+mkosi --help
+```
+
+or directly online on mkosi github
+[https://github.com/systemd/mkosi/blob/main/mkosi/resources/man/mkosi.1.md](https://github.com/systemd/mkosi/blob/main/mkosi/resources/man/mkosi.1.md)
+
 ## Build image examples
 
 ### generic
@@ -22,6 +36,13 @@ configuration files into mkosi.conf.d/.
 
 There is a default configuration file, load by everybody and after variations
 are handled with mkosi profiles.
+
+* `mkosi-*board*.conf` the entry config file for a specfic board
+* `mkosi.conf.d` the directory of snippet of configuration files,
+many of then can be activated passing profiles
+    * `default.conf` default/common configuration
+* `repart.d` the directory of snippet of partitions for systemd-repart
+* `scripts` the directory of scripts executed during the image build
 
 ## systemd-repart
 
