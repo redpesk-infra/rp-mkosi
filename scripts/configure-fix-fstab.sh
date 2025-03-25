@@ -1,7 +1,5 @@
 #!/bin/bash
 
-[ -z "$REDPESK_FIX_FSTAB" ] && cat && exit 0
-
 jsonconf=$(cat)
 
 # consider only one
