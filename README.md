@@ -66,3 +66,43 @@ the volume id/UUID, it should be a 32 bits value in /etc/fstab but it appears
 to be an 128 bits by default
 
 Issue opened: [https://github.com/systemd/systemd/issues/36735](https://github.com/systemd/systemd/issues/36735)
+
+### *Dynamic* Profiles/Include
+
+In snippet configuration, if a new profile is wanted, it needs to be set and
+included, indeed conf files are only parsed once so if the minimal profile
+needs to be append see the example below:
+
+```
+# myconf.conf that append minimal
+[Config]
+Profiles=minimal # add minimal profile in the profiles list
+
+[Include]
+Include=mkosi.conf.d/minimal.conf # load minimal.conf
+```
+
+It also works for conditionnal includes, see the afb example to load the
+afb-app-manager either for smack nor selinux:
+
+```
+# afb.conf
+[Config]
+Profiles=afb
+
+[Include]
+Include=mkosi.conf.d/afb-smack.conf
+Include=mkosi.conf.d/afb-selinux.conf
+...
+
+# afb-selinux.conf
+
+...
+[TriggerMatch]
+Profiles=selinux
+Profiles=afb
+```
+
+In this example, the two files afb-smack and afb-selinux are included
+but as it is written in the `TriggerMatch` of afb-selinux,
+it needs the afb and the selinux profile to be triggered.
