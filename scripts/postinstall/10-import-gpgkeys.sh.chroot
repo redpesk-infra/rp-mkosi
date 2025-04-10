@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "import gpg keys into rpm database"
+set -x
+rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-*
