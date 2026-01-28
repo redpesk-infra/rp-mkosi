@@ -13,7 +13,7 @@ output=$OUTPUTDIR/$(jq -r '.output // "image"' $MKOSI_CONFIG).raw
 
 { #tar
 	! which tar &> /dev/null && echo "no tar, no archive generation" && exit 0
-	{ cd $OUTPUTDIR; (set -x; tar -cJf ${output}.tar.xz $(basename ${output})); echo "compression done"; } &
+	{ cd $OUTPUTDIR; (set -x; tar --sparse -cJf ${output}.tar.xz $(basename ${output})); echo "compression done"; } &
 }
 
 { #sha256
