@@ -63,6 +63,17 @@ repo_gpgcheck=0
 type=rpm
 module_hotfixes=1
 gpgcheck=0
+
+[redpesk-third-party]
+name=RedPesk Third Party
+baseurl=https://download.redpesk.bzh/redpesk-lts/$REDPESK_DISTRO/packages/third-party/\$basearch/os/
+enabled=1
+priority=98
+metadata_expire=3h
+repo_gpgcheck=0
+type=rpm
+module_hotfixes=1
+gpgcheck=0
 EOF
 
 
