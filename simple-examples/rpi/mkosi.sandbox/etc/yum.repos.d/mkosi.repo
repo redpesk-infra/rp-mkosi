@@ -1,0 +1,55 @@
+[redpesk-bsp]
+name=RedPesk BSP
+baseurl=https://download.redpesk.bzh/redpesk-lts/batz-2.2-update/packages/rpi-bsp/$basearch/os/
+enabled=1
+priority=1
+metadata_expire=3h
+repo_gpgcheck=0
+type=rpm
+module_hotfixes=1
+gpgcheck=0
+
+[redpesk-config]
+name=RedPesk Baseos
+baseurl=https://download.redpesk.bzh/redpesk-config/
+enabled=1
+priority=98
+metadata_expire=3h
+repo_gpgcheck=0
+type=rpm
+module_hotfixes=1
+gpgcheck=0
+
+[redpesk-baseos]
+name=RedPesk Baseos
+baseurl=https://download.redpesk.bzh/redpesk-lts/batz-2.2-update/packages/baseos/$basearch/os/
+enabled=1
+priority=98
+metadata_expire=3h
+repo_gpgcheck=0
+type=rpm
+module_hotfixes=1
+gpgcheck=0
+
+
+[redpesk-middleware]
+name=RedPesk middle
+baseurl=https://download.redpesk.bzh/redpesk-lts/batz-2.2-update/packages/middleware/$basearch/os/
+enabled=1
+priority=98
+metadata_expire=3h
+repo_gpgcheck=0
+type=rpm
+module_hotfixes=1
+gpgcheck=0
+
+[redpesk-third-party]
+name=RedPesk Third Party
+baseurl=https://download.redpesk.bzh/redpesk-lts/batz-2.2-update/packages/third-party/$basearch/os/
+enabled=1
+priority=98
+metadata_expire=3h
+repo_gpgcheck=0
+type=rpm
+module_hotfixes=1
+gpgcheck=0
