@@ -16,21 +16,6 @@ or directly online on mkosi github
 
 ## Simple Examples
 
-In simple-examples directory, find "flat" configuration. In the idea to be
-get and modify much easily than in the root part of the repository. There are
-only one configuration file and no profiles.
-
-To try it for having RedpeskOS on rpi do:
-
-```
-cd simple-examples/rpi
-mkosi
-```
-
-And the image should be in the output directory.
-
-## Simple Examples
-
 In the `simple-examples` directory, you will find a **flat configuration**.
 The idea is to make it easier to understand and to modify than in the root configuration of the repository.
 There is only one configuration file and no profiles.
