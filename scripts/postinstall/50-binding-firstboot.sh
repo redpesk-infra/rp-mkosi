@@ -7,7 +7,7 @@ set -e
 RPMS_DIR="$BUILDROOT/var/lib/rp-firstboot/rpms"
 
 shopt -s expand_aliases
-alias dnf_firstboot="dnf --installroot=$BUILDROOT"
+alias dnf_firstboot="dnf4 --installroot=$BUILDROOT"
 
 mkdir -p ${RPMS_DIR}
 echo "installing $REDPESK_BINDING_LIST ..."
