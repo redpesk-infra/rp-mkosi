@@ -7,7 +7,7 @@ partitionning without any priviledge using libfdisk [https://www.freedesktop.org
 
 Have a look on the man page for more information:
 
-```
+```bash
 mkosi --help
 ```
 
@@ -33,15 +33,14 @@ The generated image will be available in the `output` directory.
 
 ### generic
 
-```
-mkosi -I mkosi-generic.conf --debug --force --debug-workspace -E REDPESK_DISTRO=batz-2.0-update --profile smack,minimal,localrepo
+```bash
+mkosi -I mkosi-generic.conf --debug --force --debug-workspace -E REDPESK_DISTRO=corn-3.0-update --profile smack,minimal,localrepo --output-directory output_generic
 ```
 
 ### rpi
 
 ```bash
-mkosi -I mkosi-rpi.conf --debug --force --debug-workspace -E REDPESK_DISTRO=batz-2.0-update --profile smack,minimal,localrepo
-
+mkosi -I mkosi-rpi.conf --debug --force --debug-workspace -E REDPESK_DISTRO=corn-3.0-update --profile smack,minimal,localrepo --output-directory output_rpi
 ```
 
 ## Organisation
@@ -55,7 +54,7 @@ are handled with mkosi profiles.
 * `mkosi-*board*.conf` the entry config file for a specfic board
 * `mkosi.conf.d` the directory of snippet of configuration files,
 many of then can be activated passing profiles
-    * `default.conf` default/common configuration
+  * `default.conf` default/common configuration
 * `repart.d` the directory of snippet of partitions for systemd-repart
 * `scripts` the directory of scripts executed during the image build
 
@@ -64,7 +63,6 @@ many of then can be activated passing profiles
 The image and partitions creation is done with systemd-repart, follow the
 repart.d documentation to describe partitions:
 [https://www.freedesktop.org/software/systemd/man/249/repart.d.html](https://www.freedesktop.org/software/systemd/man/249/repart.d.html)
-
 
 There are examples in sub-directories of repart.d/
 
@@ -120,7 +118,7 @@ In snippet configuration, if a new profile is wanted, it needs to be set and
 included, indeed conf files are only parsed once so if the minimal profile
 needs to be append see the example below:
 
-```
+```bash
 # myconf.conf that append minimal
 [Config]
 Profiles=minimal # add minimal profile in the profiles list
@@ -132,7 +130,7 @@ Include=mkosi.conf.d/minimal.conf # load minimal.conf
 It also works for conditionnal includes, see the afb example to load the
 afb-app-manager either for smack nor selinux:
 
-```
+```bash
 # afb.conf
 [Config]
 Profiles=afb
