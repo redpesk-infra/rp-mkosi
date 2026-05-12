@@ -11,7 +11,10 @@ buildrepo=$buildsource/$localrepodir
 
 mkdir -p $destrepo
 
-[ -z "$REDPESK_DISTRO" ] &&
+: "${REDPESK_DISTRO:=corn-3.0-update}"
+: "${REDPESK_REPO:=https://download.redpesk.bzh}"
+
+[ -z "${REDPESK_DISTRO}" ] &&
 	echo "REDPESK_DISTRO env variable not defined please provide it '-E REDPESK_DISTRO='" >&2 &&
 	exit 1
 
@@ -21,7 +24,7 @@ mkdir -p $destrepo
 cat << EOF > $destrepo/mkosi.repo
 [redpesk-bsp]
 name=RedPesk BSP
-baseurl=https://download.redpesk.bzh/redpesk-lts/$REDPESK_DISTRO/packages/$REDPESK_BSP/\$basearch/os/
+baseurl=${REDPESK_REPO}/redpesk-lts/${REDPESK_DISTRO}/packages/${REDPESK_BSP}/\$basearch/os/
 enabled=1
 priority=1
 metadata_expire=3h
@@ -32,7 +35,7 @@ gpgcheck=0
 
 [redpesk-config]
 name=RedPesk Baseos
-baseurl=https://download.redpesk.bzh/redpesk-config/
+baseurl=${REDPESK_REPO}/redpesk-config/
 enabled=1
 priority=98
 metadata_expire=3h
@@ -43,7 +46,7 @@ gpgcheck=0
 
 [redpesk-baseos]
 name=RedPesk Baseos
-baseurl=https://download.redpesk.bzh/redpesk-lts/$REDPESK_DISTRO/packages/baseos/\$basearch/os/
+baseurl=${REDPESK_REPO}/redpesk-lts/${REDPESK_DISTRO}/packages/baseos/\$basearch/os/
 enabled=1
 priority=98
 metadata_expire=3h
@@ -55,7 +58,7 @@ gpgcheck=0
 
 [redpesk-middleware]
 name=RedPesk middle
-baseurl=https://download.redpesk.bzh/redpesk-lts/$REDPESK_DISTRO/packages/middleware/\$basearch/os/
+baseurl=${REDPESK_REPO}/redpesk-lts/${REDPESK_DISTRO}/packages/middleware/\$basearch/os/
 enabled=1
 priority=98
 metadata_expire=3h
@@ -66,7 +69,7 @@ gpgcheck=0
 
 [redpesk-third-party]
 name=RedPesk Third Party
-baseurl=https://download.redpesk.bzh/redpesk-lts/$REDPESK_DISTRO/packages/third-party/\$basearch/os/
+baseurl=${REDPESK_REPO}/redpesk-lts/${REDPESK_DISTRO}/packages/third-party/\$basearch/os/
 enabled=1
 priority=98
 metadata_expire=3h
