@@ -74,6 +74,38 @@ there is a fix in rp-mkosi, to activate it set the environnment variable
 
 ## Troubleshooting
 
+### host PATH
+
+ mkosi may run host-side helper tools during the image build.
+
+ For example, when a kernel package is installed, mkosi can call `depmod` after the package +transaction to regenerate module dependencies.
+
+ On some host distributions, `/usr/sbin` and `/sbin` are not part of the +default user `PATH`, while tools such as `depmod` are installed under
+
+```bash
+/usr/sbin/depmod
+```
+
+In that case, mkosi can fail with an error similar to:
+
+```text
+depmod not found
+```
+
+Run mkosi with a PATH that includes the system administration directories:
+
+```bash
+PATH="/usr/sbin:/sbin:/usr/lib/systemd:$PATH" mkosi ...
+```
+
+For example:
+
+```bash
+PATH="/usr/sbin:/sbin:/usr/lib/systemd:$PATH" mkosi -I mkosi-beagleplay.conf --debug --force --debug-workspace -E REDPESK_DISTRO=corn-3.0-update --profile smack,minimal,localrepo --output-directory output_beagleplay
+```
+
+This issue is still open 22/06/2026 <https://github.com/systemd/mkosi/issues/4319>
+
 ### fstab
 
 It seems to have an issue with systemd-repart for vfat filesystem with
