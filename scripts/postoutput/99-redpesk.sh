@@ -4,7 +4,11 @@
 
 # redpesk postoutput: bmap/compress/sha256
 
-output=$OUTPUTDIR/$(jq -r '.output // "image"' $MKOSI_CONFIG).raw
+output="$OUTPUTDIR/$(jq -r '.output // "image"' "$MKOSI_CONFIG").raw"
+
+if [ "${REDPESK_HYBRID_MBR:-}" = "1" ]; then
+	./scripts/postoutput/10-hybrid-mbr.sh "$output"
+fi
 
 { # bmaptool
 	! which bmaptool &> /dev/null && echo "no bmaptool found, no bmap file generation" && exit 0
