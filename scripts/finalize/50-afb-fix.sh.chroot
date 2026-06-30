@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "fix user creation"
+# Users creation
+getent group users > /dev/null || groupadd -g 100 users ||:
+bash -x /usr/libexec/afm/afm-create-user.sh 1001 rp-owner users ||:
