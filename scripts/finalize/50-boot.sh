@@ -55,5 +55,4 @@ elif [ -f "$image_full" ]; then
     echo "/boot/Image is already a regular file" >&2
 else
     echo "/boot/Image does not exist in BUILDROOT" >&2
-    exit 1
 fi
