@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Generate uboot.scr using /boot/uboot.txt if exists
+
+: "${SECURITY:=smack}"
+
+: "${BOOTTXT:=/boot/uboot.txt}"
+
+[ ! -f ${BOOTTXT} ] && echo "No ${BOOTTXT}, no uboot script generation!" && exit 0
+
+sed -i "s/@@SECURITY@@/${SECURITY}/g" ${BOOTTXT}
+
+(set -x; mkimage -A arm -C none -T script -O u-boot -n "Redpesk boot script" -d ${BOOTTXT} /boot/boot.scr)
+
+rm -f ${BOOTTXT}
