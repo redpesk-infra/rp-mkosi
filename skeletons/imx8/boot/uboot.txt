@@ -1,0 +1,10 @@
+# Redpesk Imx8 boot script for uboot
+
+test -z ${consoleargs} || setenv consoleargs console=ttyLP0,115200
+
+ext4load mmc 0:1 ${loadaddr} Image
+ext4load mmc 0:1 ${fdt_addr} imx8qxp-mek.dtb
+setenv bootargs earlycon console=${consoleargs} root=/dev/mmcblk0p5 rootwait rw security=@@SECURITY@@
+
+echo Booting with bootargs=${bootargs}
+booti ${loadaddr} - ${fdt_addr}
