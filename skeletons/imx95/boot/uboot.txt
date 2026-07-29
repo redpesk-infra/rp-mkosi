@@ -1,6 +1,6 @@
 # Redpesk Imx8 boot script for uboot
 
-test -z ${consoleargs} || setenv consoleargs console=ttyLP0,115200
+test -z ${consoleargs} || setenv consoleargs console=ttyLP2,115200
 
 ext4load mmc 0:1 ${loadaddr} Image
 ext4load mmc 0:1 ${fdt_addr} imx95-19x19-evk.dtb
