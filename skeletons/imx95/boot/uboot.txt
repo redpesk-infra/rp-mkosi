@@ -1,10 +1,11 @@
-# Redpesk Imx8 boot script for uboot
+# Redpesk iMX95 boot script for uboot
 
 test -z ${consoleargs} || setenv consoleargs console=ttyLP2,115200
+test -z ${mmcdev} || setenv mmcdev 1
 
-ext4load mmc 0:1 ${loadaddr} Image
-ext4load mmc 0:1 ${fdt_addr} imx95-19x19-evk.dtb
-setenv bootargs earlycon console=${consoleargs} root=/dev/mmcblk0p5 rootwait rw security=@@SECURITY@@
+ext4load mmc ${mmcdev}:1 ${loadaddr} Image
+ext4load mmc ${mmcdev}:1 ${fdt_addr} imx95-aquila-dev.dtb
+setenv bootargs earlycon ${consoleargs} root=/dev/mmcblk${mmcdev}p4 rootwait rw security=@@SECURITY@@
 
 echo Booting with bootargs=${bootargs}
 booti ${loadaddr} - ${fdt_addr}
