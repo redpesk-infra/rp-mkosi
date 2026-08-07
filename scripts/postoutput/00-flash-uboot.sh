@@ -18,6 +18,9 @@ set -e
 
 IMAGE=$OUTPUTDIR/$(jq -r '.output // "image"' $MKOSI_CONFIG).raw
 
+# in GPT default partition table has 128 entries
+[ "$GPT_RESIZE_TABLE_NB" ] && echo "resize table for GPT to $GPT_RESIZE_TABLE_NB" && sgdisk -S $GPT_RESIZE_TABLE_NB $IMAGE
+
 echo "Flashing the bootloader to the image..."
 
 for DD_OPTS in $REDPESK_FLASH_BINS; do
