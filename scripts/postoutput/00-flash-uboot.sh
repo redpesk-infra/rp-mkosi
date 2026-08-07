@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Goal: flash bootloader to the final image 
+# Goal: flash bootloader to the final image
 # (U-Boot + firmwares + ARM Trusted Firmware)
 
 # REDPESK_FLASH_BINS list of binaries to flash 'BINARY_PATH:ddoption1,ddoption2,...[BINARY_PATH:ddoption1,ddoption2,...]'
-# e.g.: 
+# e.g.:
 # REDPESK_FLASH_BINS="\
 # /usr/lib/firmware/layerscape/firmware_lx2160ardb.img:bs=512,seek=8,conv=fsync \
 # /boot/atf/bl2_sd.pbl:bs=512,seek=8,conv=fsync \
