@@ -1,7 +1,5 @@
 #!/bin/bash
 
-[ "$REDPESK_BYPASS_POSTOUTPUT" ] && exit 0
-
 # redpesk postoutput: bmap/compress/sha256
 
 output="$OUTPUTDIR/$(jq -r '.output // "image"' "$MKOSI_CONFIG").raw"
@@ -9,6 +7,8 @@ output="$OUTPUTDIR/$(jq -r '.output // "image"' "$MKOSI_CONFIG").raw"
 if [ "${REDPESK_HYBRID_MBR:-}" = "1" ]; then
 	./scripts/postoutput/10-hybrid-mbr.py "$output"
 fi
+
+[ "$REDPESK_BYPASS_POSTOUTPUT" ] && exit 0
 
 { # bmaptool
 	! which bmaptool &> /dev/null && echo "no bmaptool found, no bmap file generation" && exit 0
