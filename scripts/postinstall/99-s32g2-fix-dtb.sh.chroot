@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -x
+# remove broken links
+find /boot -xtype l -delete
+find /lib/modules/ -type f -name 's32g274a-rdb2*.dtb' -exec cp -f -t /boot {} +
