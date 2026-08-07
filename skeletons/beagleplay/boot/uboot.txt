@@ -2,7 +2,7 @@
 
 echo Boot into normal mode...
 
-test -z ${consoleargs} || setenv consoleargs ttyS2,115200n8
+test -n ${consoleargs} || setenv consoleargs ttyS2,115200n8
 
 setenv mmcroot /dev/mmcblk${devnum}p5 rootwait rw
 setenv bootargs console=${consoleargs} root=${mmcroot} security=@@SECURITY@@
