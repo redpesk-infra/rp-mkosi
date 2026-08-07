@@ -1,0 +1,15 @@
+# Redpesk boot script commands for uboot
+
+test -n ${console} || setenv console ttyLF0
+test -n ${baudrate} || setenv baudrate 115200
+
+# setting the bootargs again
+setenv mmcroot /dev/mmcblk0p@@ROOT_PART_NB@@ rootwait rw
+setenv bootargs console=${console},${baudrate} earlycon root=${mmcroot} security=@@SECURITY@@
+
+# kernel + device tree booting
+load mmc ${mmcdev}:${mmcpart} ${loadaddr} Image
+load mmc ${mmcdev}:${mmcpart} ${fdt_addr} s32g274a-rdb2.dtb
+
+echo Booting with bootargs=${bootargs}
+booti ${loadaddr} - ${fdt_addr}
