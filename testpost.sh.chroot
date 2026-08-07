@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# generate grub2 entries
-
-rm -f /boot/efi/EFI/redpesk/grub.cfg
-grub2-mkconfig -o /boot/efi/EFI/redpesk/grub.cfg
