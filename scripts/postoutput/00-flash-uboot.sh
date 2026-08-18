@@ -26,7 +26,7 @@ echo "Flashing the bootloader to the image..."
 for DD_OPTS in $REDPESK_FLASH_BINS; do
 
 	FILE_TO_FLASH=$UBOOT_DIR/$(basename $(echo $DD_OPTS | cut -d ':' -f 1))
-	OPTS=$(echo $DD_OPTS | cut -d ':' -f 2 | tr ',' ' ')
+	OPTS=$(echo $DD_OPTS | cut -d ':' -f 2 | tr ';' ' ')
 
 	( set -x; dd if=$FILE_TO_FLASH of=$IMAGE $OPTS)
 
