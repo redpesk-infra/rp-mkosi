@@ -4,7 +4,7 @@ echo Boot into normal mode...
 
 test -n ${consoleargs} || setenv consoleargs ttyS2,115200n8
 
-setenv mmcroot /dev/mmcblk${devnum}p5 rootwait rw
+setenv mmcroot /dev/mmcblk${devnum}p4 rootwait rw
 setenv bootargs console=${consoleargs} root=${mmcroot} security=@@SECURITY@@
 load mmc ${devnum}:1 ${loadaddr} Image
 load mmc ${devnum}:1  ${fdt_addr_r} k3-am625-beagleplay.dtb
