@@ -107,11 +107,42 @@ def mbr_entry(bootable: bool, part_type: int, start_lba: int, size_lba: int) -> 
     )
 
 
-def create_hybrid_mbr(
-    image: str, partition_index: int, mbr_type: int, active: bool
-) -> None:
+def parse_partition_spec(value: str) -> tuple[int, int, bool]:
+    fields = value.split(":")
+    if len(fields) != 3:
+        die(
+            f"invalid hybrid partition specification: {value}; "
+            "expected GPT_INDEX:MBR_TYPE:ACTIVE"
+        )
+
+    partition_index = parse_int(fields[0], "partition index")
+    mbr_type = parse_int(fields[1], "MBR type")
+    active = parse_bool(fields[2])
+
     if partition_index < 1:
         die("partition index must be >= 1")
+
+    return partition_index, mbr_type, active
+
+
+def parse_partition_specs(value: str) -> list[tuple[int, int, bool]]:
+    specs = [item.strip() for item in value.split(",") if item.strip()]
+    if not specs:
+        die("hybrid partition list is empty")
+
+    partitions = [parse_partition_spec(item) for item in specs]
+    indexes = [partition[0] for partition in partitions]
+    if len(indexes) != len(set(indexes)):
+        die("the same GPT partition cannot be exposed more than once")
+    if len(partitions) > 3:
+        die("a hybrid MBR can expose at most 3 GPT partitions")
+
+    return partitions
+
+
+def create_hybrid_mbr(
+    image: str, partitions: list[tuple[int, int, bool]]
+) -> None:
 
     image_size = os.path.getsize(image)
     if image_size % SECTOR_SIZE != 0:
@@ -133,25 +164,45 @@ def create_hybrid_mbr(
 
         if current_lba != 1:
             die(f"unexpected primary GPT header LBA: {current_lba}")
-        if partition_index > number_of_entries:
-            die(f"partition {partition_index} does not exist in GPT")
         if entry_size < 128:
             die(f"unsupported GPT entry size: {entry_size}")
 
-        entry_offset = (entry_start_lba * SECTOR_SIZE) + (
-            (partition_index - 1) * entry_size
-        )
-        f.seek(entry_offset)
-        entry = f.read(entry_size)
+        exposed = []
+        for partition_index, mbr_type, active in partitions:
+            if partition_index > number_of_entries:
+                die(f"partition {partition_index} does not exist in GPT")
 
-        if len(entry) != entry_size or entry[:16] == b"\x00" * 16:
-            die(f"GPT partition {partition_index} is empty")
+            entry_offset = (entry_start_lba * SECTOR_SIZE) + (
+                (partition_index - 1) * entry_size
+            )
+            f.seek(entry_offset)
+            entry = f.read(entry_size)
 
-        first_lba = struct.unpack_from("<Q", entry, 32)[0]
-        last_lba = struct.unpack_from("<Q", entry, 40)[0]
+            if len(entry) != entry_size or entry[:16] == b"\x00" * 16:
+                die(f"GPT partition {partition_index} is empty")
 
-        if first_lba <= 1 or last_lba < first_lba or last_lba >= disk_lbas:
-            die(f"invalid GPT partition range: first={first_lba}, last={last_lba}")
+            first_lba = struct.unpack_from("<Q", entry, 32)[0]
+            last_lba = struct.unpack_from("<Q", entry, 40)[0]
+
+            if first_lba <= 1 or last_lba < first_lba or last_lba >= disk_lbas:
+                die(
+                    f"invalid GPT partition {partition_index} range: "
+                    f"first={first_lba}, last={last_lba}"
+                )
+
+            exposed.append(
+                (partition_index, mbr_type, active, first_lba, last_lba)
+            )
+
+        # Sort by disk position so the protective ranges are deterministic,
+        # while keeping all exposed entries ahead of the 0xEE entries as before.
+        exposed.sort(key=lambda partition: partition[3])
+
+        for previous, current in zip(exposed, exposed[1:]):
+            if current[3] <= previous[4]:
+                die(
+                    f"GPT partitions {previous[0]} and {current[0]} overlap"
+                )
 
         entries = [
             mbr_entry(
@@ -160,22 +211,34 @@ def create_hybrid_mbr(
                 first_lba,
                 last_lba - first_lba + 1,
             )
+            for _, mbr_type, active, first_lba, last_lba in exposed
         ]
 
-        # Protect the primary GPT header and entry array before the exposed partition.
-        if first_lba > 1:
+        first_exposed_lba = exposed[0][3]
+        last_exposed_lba = exposed[-1][4]
+
+        # The first protective entry must start at LBA 1 so GPT-aware tools
+        # continue to recognize the disk as GPT. It protects the primary GPT
+        # metadata and everything before the first exposed partition.
+        if first_exposed_lba > 1:
             entries.append(
                 mbr_entry(
                     False,
                     0xEE,
                     1,
-                    min(first_lba - 1, 0xFFFFFFFF),
+                    min(first_exposed_lba - 1, 0xFFFFFFFF),
                 )
             )
 
-        # Protect every GPT-only area after the exposed partition from MBR-only tools.
-        after_start = last_lba + 1
-        if after_start < disk_lbas and after_start <= 0xFFFFFFFF:
+        # If an MBR slot remains, protect the tail of the disk too. Internal
+        # gaps between exposed GPT partitions intentionally remain unrepresented:
+        # an MBR has only four primary entries.
+        after_start = last_exposed_lba + 1
+        if (
+            len(entries) < 4
+            and after_start < disk_lbas
+            and after_start <= 0xFFFFFFFF
+        ):
             entries.append(
                 mbr_entry(
                     False,
@@ -186,7 +249,10 @@ def create_hybrid_mbr(
             )
 
         if len(entries) > 4:
-            die("internal error: too many MBR entries")
+            die(
+                "not enough MBR entries for the requested hybrid partitions "
+                "and the required GPT protective entry"
+            )
 
         table = b"".join(entries).ljust(16 * 4, b"\x00")
 
@@ -215,6 +281,16 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--partitions",
+        default=os.environ.get("REDPESK_HYBRID_MBR_PARTITIONS"),
+        help=(
+            "Comma-separated GPT_INDEX:MBR_TYPE:ACTIVE entries to expose. "
+            "Example: 1:0x83:0,2:0x0c:1. Overrides legacy --partition, "
+            "--mbr-type and --active options."
+        ),
+    )
+
+    parser.add_argument(
         "--partition",
         default=os.environ.get("REDPESK_HYBRID_MBR_PARTITION", "1"),
         help="GPT partition index to expose in the MBR. Default: 1.",
@@ -239,16 +315,24 @@ def main() -> None:
     args = parse_args()
 
     image = args.image or default_image_path()
-    partition_index = parse_int(args.partition, "partition")
-    mbr_type = parse_int(args.mbr_type, "MBR type")
-    active = parse_bool(args.active)
+    if args.partitions:
+        partitions = parse_partition_specs(args.partitions)
+    else:
+        # Backward-compatible single-partition configuration.
+        partition_index = parse_int(args.partition, "partition")
+        mbr_type = parse_int(args.mbr_type, "MBR type")
+        active = parse_bool(args.active)
+        if partition_index < 1:
+            die("partition index must be >= 1")
+        partitions = [(partition_index, mbr_type, active)]
 
-    create_hybrid_mbr(image, partition_index, mbr_type, active)
+    create_hybrid_mbr(image, partitions)
 
-    print(
-        f"hybrid-mbr: exposed GPT partition {partition_index} "
-        f"as MBR type {mbr_type:#04x} in {image}"
+    description = ", ".join(
+        f"GPT {index} -> MBR {mbr_type:#04x}{' active' if active else ''}"
+        for index, mbr_type, active in partitions
     )
+    print(f"hybrid-mbr: exposed {description} in {image}")
 
 
 if __name__ == "__main__":
