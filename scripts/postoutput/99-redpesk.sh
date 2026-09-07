@@ -4,6 +4,9 @@
 
 output="$OUTPUTDIR/$(jq -r '.output // "image"' "$MKOSI_CONFIG").raw"
 
+# link hard image.aw to Redpesk-OS.img
+ln $output $OUTPUTDIR/Redpesk-OS.img
+
 if [ "${REDPESK_HYBRID_MBR:-}" = "1" ]; then
 	./scripts/postoutput/10-hybrid-mbr.py "$output"
 fi
@@ -17,7 +20,7 @@ fi
 
 { #tar
 	! which tar &> /dev/null && echo "no tar, no archive generation" && exit 0
-	{ cd $OUTPUTDIR; (set -x; tar --sparse -cJf ${output}.tar.xz $(basename ${output})); echo "compression done"; } &
+	{ cd $OUTPUTDIR; (set -x; tar --sparse -cJf ${output}.tar.xz Redpesk-OS.img); echo "compression done"; } &
 }
 
 { #sha256
