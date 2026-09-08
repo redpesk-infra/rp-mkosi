@@ -29,3 +29,5 @@ fi
 }
 
 wait
+
+[ "$DONT_REMOVE_REDPESK_OS_IMG" ] || rm -f $OUTPUTDIR/Redpesk-OS.img
