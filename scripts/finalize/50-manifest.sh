@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rpm -qa --root $BUILDROOT > $OUTPUTDIR/manifest.log
+rpm -qa --root $BUILDROOT | sort -h > $OUTPUTDIR/manifest.log
 
