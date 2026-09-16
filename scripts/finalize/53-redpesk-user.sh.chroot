@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -x
+
+#creation of user redpesk (used for demo/ssh)
+useradd -m -c "redpesk user" redpesk
+echo "redpesk:redpesk" | chpasswd
+#user belongs to sudoers
+usermod -aG wheel redpesk

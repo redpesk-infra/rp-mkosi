@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -x
+
+# Note that /etc/dnf/dnf.conf is not replace at dnf upgrade
+echo "do not install weak deps"
+echo "install_weak_deps=0" >> /etc/dnf/dnf.conf
+
+# Fix "/etc/rc.d/rc.local is not marked executable"
+chmod +x /etc/rc.d/rc.local
