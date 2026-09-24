@@ -2,7 +2,13 @@
 
 # We don't load the dtb and overlays as the firmware already did the job
 
-test -n ${consoleargs} || setenv consoleargs ttyAMA0,115200
+if test -z "${consoleargs}"; then
+    if test "${board_name}" = "5 Model B"; then
+        setenv consoleargs "ttyAMA10,115200"
+    else
+        setenv consoleargs "ttyAMA0,115200"
+    fi
+fi
 
 load mmc 0:1 ${kernel_addr_r} Image
 setenv bootargs earlyprintk 8250.nr_uarts=1 console=${consoleargs} rw root=/dev/mmcblk0p4 rootfstype=ext4 rootwait security=@@SECURITY@@
